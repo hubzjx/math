@@ -65,3 +65,19 @@ Thumbs.db
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# YOLO models and results
+*.pt
+*.weights
+*.cfg
+yolo_results/
+roi_results/
+batch_results/
+custom_results/
+detailed_results/
+
+# Test images
+test_image.jpg
+test_*.jpg
+large_image.jpg
+image*.jpg
