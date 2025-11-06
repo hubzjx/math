@@ -34,7 +34,6 @@ DEFAULT_CONFIDENCE_THRESHOLD = 0.25
 DEFAULT_NMS_THRESHOLD = 0.45
 DEFAULT_WINDOW_SIZE = (640, 640)
 DEFAULT_OVERLAP_RATIO = 0.2
-MAX_IMAGE_DIMENSION = 4096
 AUTO_SCALE_THRESHOLD = 2048
 SUPPORTED_IMAGE_FORMATS = ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.tif']
 
@@ -175,23 +174,19 @@ class YOLOSlidingCounter:
         try:
             logger.info(f"Loading YOLO model from: {model_path}")
             
-            # Try to import ultralytics YOLO
+            # Try to import and use ultralytics YOLO
             try:
                 from ultralytics import YOLO
                 model = YOLO(model_path)
                 logger.info("Model loaded successfully using ultralytics")
                 return model
-            except ImportError:
-                logger.warning("ultralytics not available, trying opencv")
-                
-                # Fallback to OpenCV DNN
-                import cv2
-                model = cv2.dnn.readNetFromDarknet(
-                    model_path.replace('.pt', '.cfg'),
-                    model_path.replace('.pt', '.weights')
+            except ImportError as e:
+                error_msg = (
+                    "ultralytics package not found. Please install it with: "
+                    "pip install ultralytics"
                 )
-                logger.info("Model loaded successfully using OpenCV DNN")
-                return model
+                logger.error(error_msg)
+                raise RuntimeError(error_msg) from e
                 
         except Exception as e:
             error_msg = f"Failed to load YOLO model: {str(e)}"
@@ -259,7 +254,9 @@ class YOLOSlidingCounter:
             import cv2
             
             # Ensure output directory exists
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            output_dir = os.path.dirname(output_path)
+            if output_dir:  # Only create if there's a directory component
+                os.makedirs(output_dir, exist_ok=True)
             
             success = cv2.imwrite(output_path, image)
             
@@ -469,11 +466,16 @@ class YOLOSlidingCounter:
         if width > win_w and height > win_h:
             windows.append((width - win_w, height - win_h, width, height))
         
-        # Remove duplicates
-        windows = list(set(windows))
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_windows = []
+        for window in windows:
+            if window not in seen:
+                seen.add(window)
+                unique_windows.append(window)
         
-        logger.info(f"Generated {len(windows)} sliding windows")
-        return windows
+        logger.info(f"Generated {len(unique_windows)} sliding windows")
+        return unique_windows
     
     def _detect_in_window(
         self,

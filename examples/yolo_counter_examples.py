@@ -7,13 +7,16 @@ for object detection and counting.
 """
 
 import os
-import sys
 from pathlib import Path
 
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from yolo_sliding_counter import YOLOSlidingCounter
+# Import from parent package
+try:
+    from yolo_sliding_counter import YOLOSlidingCounter
+except ImportError:
+    # Fallback for direct execution
+    import sys
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from yolo_sliding_counter import YOLOSlidingCounter
 
 
 def example_1_basic_counting():

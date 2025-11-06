@@ -13,19 +13,30 @@ from pathlib import Path
 import numpy as np
 from unittest.mock import Mock, patch, MagicMock
 
-# Add parent directory to path for imports
-import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from yolo_sliding_counter import (
-    YOLOSlidingCounter,
-    DetectionResult,
-    DEFAULT_CONFIDENCE_THRESHOLD,
-    DEFAULT_NMS_THRESHOLD,
-    DEFAULT_WINDOW_SIZE,
-    DEFAULT_OVERLAP_RATIO,
-    SUPPORTED_IMAGE_FORMATS
-)
+# Import from parent package
+try:
+    from yolo_sliding_counter import (
+        YOLOSlidingCounter,
+        DetectionResult,
+        DEFAULT_CONFIDENCE_THRESHOLD,
+        DEFAULT_NMS_THRESHOLD,
+        DEFAULT_WINDOW_SIZE,
+        DEFAULT_OVERLAP_RATIO,
+        SUPPORTED_IMAGE_FORMATS
+    )
+except ImportError:
+    # Fallback for direct execution
+    import sys
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from yolo_sliding_counter import (
+        YOLOSlidingCounter,
+        DetectionResult,
+        DEFAULT_CONFIDENCE_THRESHOLD,
+        DEFAULT_NMS_THRESHOLD,
+        DEFAULT_WINDOW_SIZE,
+        DEFAULT_OVERLAP_RATIO,
+        SUPPORTED_IMAGE_FORMATS
+    )
 
 
 class TestYOLOSlidingCounterInitialization(unittest.TestCase):
